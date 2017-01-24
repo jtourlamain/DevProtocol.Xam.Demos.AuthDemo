@@ -1,4 +1,5 @@
-﻿using Xamarin.Forms;
+﻿using DevProtocol.Xam.Demos.AuthDemo.Pages;
+using Xamarin.Forms;
 
 namespace DevProtocol.Xam.Demos.AuthDemo
 {
@@ -8,7 +9,7 @@ namespace DevProtocol.Xam.Demos.AuthDemo
 		{
 			InitializeComponent();
 
-			MainPage = new DevProtocol_Xam_Demos_AuthDemoPage();
+			MainPage = new NavigationPage(new MainPage());
 		}
 
 		protected override void OnStart()
