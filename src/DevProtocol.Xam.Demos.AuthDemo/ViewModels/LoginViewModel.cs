@@ -17,6 +17,7 @@ namespace DevProtocol.Xam.Demos.AuthDemo.ViewModels
 		public LoginViewModel()
 		{
 			AuthUrl = CreateAuthUrl();
+			this.PropertyChanged += ViewModel_PropertyChanged;
 		}
 
 		private UrlWebViewSource CreateAuthUrl()
@@ -29,12 +30,13 @@ namespace DevProtocol.Xam.Demos.AuthDemo.ViewModels
 			dic.Add("response_type", "Assertion");
 			dic.Add("scope", ApiKeys.Scope);
 			dic.Add("redirect_uri", ApiKeys.RedirectUrl);
-			//dic.Add("nonce", Guid.NewGuid().ToString("N"));
 			_currentCSRFToken = Guid.NewGuid().ToString("N");
 			dic.Add("state", _currentCSRFToken);
 			result.Url = authorizeRequest.Create(dic);
 			return result;
 		}
+
+
 
 		#region Bindable Properties
 		UrlWebViewSource authUrl;
@@ -45,42 +47,39 @@ namespace DevProtocol.Xam.Demos.AuthDemo.ViewModels
 		}
 		#endregion
 
-		#region Commands
-		private ICommand verifyLoginCommand;
-		public ICommand VerifyLoginCommand
-		{
-			get { return verifyLoginCommand ?? (verifyLoginCommand = new Command(async (url) => await ExecuteVerifyLoginCommand(url))); }
-		}
 
-		#endregion
-
-		private async Task ExecuteVerifyLoginCommand(object urlToVerify)
+		private async void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
-			var url = urlToVerify as string;
-			if (url.Contains(ApiKeys.RedirectUrl))
+			if (e.PropertyName == nameof(AuthUrl))
 			{
-				var authorizeResponse = new AuthorizeResponse(url);
-				var keyValues = new List<KeyValuePair<string, string>>();
-				keyValues.Add(new KeyValuePair<string, string>("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"));
-				keyValues.Add(new KeyValuePair<string, string>("client_assertion", ApiKeys.ClientSecret));
-				keyValues.Add(new KeyValuePair<string, string>("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer"));
-				keyValues.Add(new KeyValuePair<string, string>("assertion", authorizeResponse.Code));
-				keyValues.Add(new KeyValuePair<string, string>("redirect_uri", ApiKeys.RedirectUrl));
-
-
-				using (var client = new HttpClient())
+				var url = AuthUrl.Url;
+				if (url.Contains(ApiKeys.RedirectUrl))
 				{
-					//client.BaseAddress = new Uri(ApiKeys.AccessTokenUrl);
-					client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
-					var r = await client.PostAsync(ApiKeys.AccessTokenUrl, new FormUrlEncodedContent(keyValues));
-					var t = await r.Content.ReadAsStringAsync();
+					var authorizeResponse = new AuthorizeResponse(url);
+					var state = "";
+					authorizeResponse.Values.TryGetValue("state", out state);
 
+					if (state == _currentCSRFToken)
+					{
+						var keyValues = new Dictionary<string, string>();
+						keyValues.Add("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
+						keyValues.Add("client_assertion", ApiKeys.ClientSecret);
+						keyValues.Add("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer");
+						keyValues.Add("assertion", authorizeResponse.Code);
+						keyValues.Add("redirect_uri", ApiKeys.RedirectUrl);
 
+						var tokenclient = new TokenClient(ApiKeys.AccessTokenUrl);
+						var tokenResponse = await tokenclient.RequestAsync(keyValues);
+						App.User.AccessToken = tokenResponse.AccessToken;
+						App.User.RefreshToken = tokenResponse.RefreshToken;
+					}
+					else
+					{
+						// Log CSRF token doesn't match.
+					}
+					MessagingCenter.Send<LoginViewModel>(this, MessageKeys.NavigateToMain);
 				}
-
 			}
-
-			await Task.FromResult(0);
 		}
 	}
 }

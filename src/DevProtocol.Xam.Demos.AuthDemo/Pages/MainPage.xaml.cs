@@ -21,13 +21,10 @@ namespace DevProtocol.Xam.Demos.AuthDemo.Pages
 
 		protected override void OnAppearing()
 		{
+			lblToken.Text = App.User.AccessToken;
 			MessagingCenter.Subscribe<MainViewModel>(this, MessageKeys.NavigateToLogin, async _ =>
 			  {
 				  await Navigation.PushModalAsync(new LoginPage());
-			  });
-			MessagingCenter.Subscribe<MainViewModel>(this, MessageKeys.NavigateToRepos, async _ =>
-			  {
-				  await Navigation.PushAsync(new ReposPage());
 			  });
 			base.OnAppearing();
 		}
@@ -35,7 +32,6 @@ namespace DevProtocol.Xam.Demos.AuthDemo.Pages
 		protected override void OnDisappearing()
 		{
 			MessagingCenter.Unsubscribe<MainViewModel>(this, MessageKeys.NavigateToLogin);
-			MessagingCenter.Unsubscribe<MainViewModel>(this, MessageKeys.NavigateToRepos);
 			base.OnDisappearing();
 		}
 	}

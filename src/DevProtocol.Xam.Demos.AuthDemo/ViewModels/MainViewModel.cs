@@ -7,16 +7,12 @@ namespace DevProtocol.Xam.Demos.AuthDemo.ViewModels
 {
 	public class MainViewModel : BaseViewModel
 	{
+		
 		#region Commands
 		private ICommand loginCommand;
 		public ICommand LoginCommand
 		{
 			get { return loginCommand ?? (loginCommand = new Command(() => ExecuteLoginCommand())); }
-		}
-		private ICommand gitHubReposCommand;
-		public ICommand GitHubReposCommand
-		{
-			get { return gitHubReposCommand ?? (gitHubReposCommand = new Command(() => ExecuteGoToReposCommand())); }
 		}
 		#endregion
 
@@ -28,14 +24,6 @@ namespace DevProtocol.Xam.Demos.AuthDemo.ViewModels
 			IsBusy = false;
 		}
 
-		private void ExecuteGoToReposCommand()
-		{
-			if (IsBusy)
-				return;
-			IsBusy = true;
-			MessagingCenter.Send<MainViewModel>(this, MessageKeys.NavigateToRepos);
-			IsBusy = false;
-		}
 	}
 }
 

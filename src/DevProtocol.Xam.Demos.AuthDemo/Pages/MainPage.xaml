@@ -5,7 +5,7 @@
 	<ContentPage.Content>
 		<StackLayout VerticalOptions="Center" HorizontalOptions="Center">
 		    <Button Text="Login" Command="{Binding LoginCommand}" />
-		    <Button Text="GitHubRepos" Command="{Binding GitHubReposCommand}" />
+		    <Label x:Name="lblToken" />
 		</StackLayout>
 	</ContentPage.Content>
 </ContentPage>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DevProtocol.Xam.Demos.AuthDemo.Configuration;
 using DevProtocol.Xam.Demos.AuthDemo.ViewModels;
 using Xamarin.Forms;
 
@@ -21,18 +22,18 @@ namespace DevProtocol.Xam.Demos.AuthDemo.Pages
 		protected override void OnAppearing()
 		{
 			base.OnAppearing();
-			webAuth.Navigated += WebAuth_Navigated;
-		}
-
-		void WebAuth_Navigated(object sender, WebNavigatedEventArgs e)
-		{
-			ViewModel.VerifyLoginCommand.Execute(e.Url);
+			MessagingCenter.Subscribe<LoginViewModel>(this, MessageKeys.NavigateToMain, async _ =>
+			  {
+				await Navigation.PopModalAsync();
+			  });
 		}
 
 		protected override void OnDisappearing()
 		{
 			base.OnDisappearing();
-			webAuth.Navigated -= WebAuth_Navigated;
+			MessagingCenter.Unsubscribe<LoginViewModel>(this, MessageKeys.NavigateToMain);
 		}
+
+
 	}
 }

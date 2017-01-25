@@ -1,14 +1,16 @@
-﻿using DevProtocol.Xam.Demos.AuthDemo.Pages;
+﻿using DevProtocol.Xam.Demos.AuthDemo.Domain;
+using DevProtocol.Xam.Demos.AuthDemo.Pages;
 using Xamarin.Forms;
 
 namespace DevProtocol.Xam.Demos.AuthDemo
 {
 	public partial class App : Application
 	{
+		public static User User = new User();
+
 		public App()
 		{
 			InitializeComponent();
-
 			MainPage = new NavigationPage(new MainPage());
 		}
 
