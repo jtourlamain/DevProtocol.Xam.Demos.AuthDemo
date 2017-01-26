@@ -12,4 +12,4 @@ A Xamarin demo application that shows how to use OAuth without Xamarin.Auth.
 [http://www.devprotocol.com/oauth-without-xamarin-auth/](http://www.devprotocol.com/oauth-without-xamarin-auth/)
 
 ## License
-Under MIT (See LICENSE.md)
+Under MIT (See [LICENSE.md](LICENSE.md))
